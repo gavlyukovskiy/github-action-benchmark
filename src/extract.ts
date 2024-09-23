@@ -286,7 +286,19 @@ async function getCommitFromGitHubAPIRequest(githubToken: string, ref?: string):
     };
 }
 
-async function getCommit(githubToken?: string, ref?: string): Promise<Commit> {
+async function getCommit(githubToken?: string, ref?: string): Promise<Commit> {\
+    if (ref) {
+        if (!githubToken) {
+            throw new Error(
+                `No commit information is found in payload: ${JSON.stringify(
+                    github.context.payload,
+                    null,
+                    2,
+                )}. Also, no 'github-token' provided, could not fallback to GitHub API Request.`,
+            );
+        }
+        return getCommitFromGitHubAPIRequest(githubToken, ref);
+    }
     if (github.context.payload.head_commit) {
         return github.context.payload.head_commit;
     }
@@ -296,18 +308,6 @@ async function getCommit(githubToken?: string, ref?: string): Promise<Commit> {
     if (pr) {
         return getCommitFromPullRequestPayload(pr);
     }
-
-    if (!githubToken) {
-        throw new Error(
-            `No commit information is found in payload: ${JSON.stringify(
-                github.context.payload,
-                null,
-                2,
-            )}. Also, no 'github-token' provided, could not fallback to GitHub API Request.`,
-        );
-    }
-
-    return getCommitFromGitHubAPIRequest(githubToken, ref);
 }
 
 function extractCargoResult(output: string): BenchmarkResult[] {
