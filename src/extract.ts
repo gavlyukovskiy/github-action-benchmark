@@ -286,7 +286,7 @@ async function getCommitFromGitHubAPIRequest(githubToken: string, ref?: string):
     };
 }
 
-async function getCommit(githubToken?: string, ref?: string): Promise<Commit> {\
+async function getCommit(githubToken?: string, ref?: string): Promise<Commit> {
     if (ref) {
         if (!githubToken) {
             throw new Error(
